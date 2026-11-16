@@ -18,3 +18,4 @@ html[data-theme="dark"]{color-scheme:dark;--ink:#e7edf7;--muted:#a4b0c2;--paper:
 @media(max-width:520px){#ftoPlayer{height:280px}}
 .scramble-code{font-size:13px!important;line-height:1.5;white-space:normal;overflow-wrap:anywhere;text-align:left}
 .physical-done{margin-top:12px}
+.lesson-footer button.source-link{border:0;background:none;font:inherit;cursor:pointer;padding:0}
