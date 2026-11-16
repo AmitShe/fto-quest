@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <link rel="stylesheet" href="./style.css?v=6">
+  <link rel="stylesheet" href="./style.css?v=7">
   <title>FTO Quest — לומדים לפתור</title>
 </head>
 <body>
@@ -21,14 +21,14 @@
         <img src="./icon.svg" alt="" width="42" height="42">
         <span><strong>FTO QUEST</strong><small>לומדים לפתור, תנועה אחר תנועה</small></span>
       </a>
-      <div class="top-actions"><span class="beta">גרסת התנסות</span><button id="installBtn" class="install-btn" type="button">＋ הוספה למסך הבית</button></div>
+      <div class="top-actions"><span class="beta">גרסת התנסות</span><button id="themeBtn" class="theme-btn" type="button" aria-label="הפעלת מצב כהה" title="מצב כהה">☾</button><button id="installBtn" class="install-btn" type="button">＋ הוספה למסך הבית</button></div>
     </header>
 
     <main id="homeView" class="home-view">
       <div class="hero-copy">
         <div class="eyebrow"><span class="spark">✦</span> מסלול הלימוד שלך</div>
         <h1>קובייה חדשה.<br><em>דרך חדשה לחשוב.</em></h1>
-        <p>להכיר את ה־FTO דרך הידיים: לזהות חלקים, להבין תנועות, לתרגל טריגרים, ולהתקדם לפתרון מלא.</p>
+        <p>ללמוד לפתור FTO דרך הידיים: להבין תנועות, לתרגל טריגרים, ולהתקדם שלב אחר שלב לפתרון מלא.</p>
         <div class="hero-actions"><button id="startBtn" class="primary-btn" type="button">מתחילים לשחק <span>←</span></button><button id="labBtn" class="ghost-btn" type="button">מעבדת קובייה</button></div>
         <div class="progress-card"><div><strong id="progressText">0 מתוך 7 משימות</strong><span>ההתקדמות נשמרת במכשיר הזה</span></div><div class="progress-track"><div id="progressFill"></div></div></div>
       </div>
@@ -39,11 +39,11 @@
     <main id="lessonView" class="lesson-view hidden">
       <aside class="lesson-sidebar"><button id="backBtn" class="back-btn" type="button">→ חזרה למסלול</button><div class="sidebar-heading">המסלול שלי</div><nav id="lessonNav" aria-label="משימות לימוד"></nav><div class="sidebar-tip"><span>💡</span><p>אפשר לחזור לכל משימה בכל רגע. טעויות הן חלק מהאימון.</p></div></aside>
       <section class="lesson-content"><div class="lesson-meta"><span id="chapterTag"></span><span id="lessonCount"></span></div><h2 id="lessonTitle"></h2><p id="lessonIntro" class="lesson-intro"></p><div id="lessonTask" class="lesson-task"></div><div id="lessonFooter" class="lesson-footer"></div></section>
-      <section class="puzzle-panel"><div class="puzzle-top"><span class="live-indicator"><i></i> FTO NET</span><span class="view-actions"><button id="resetViewBtn" class="text-btn" type="button">איפוס תרגול ↺</button></span></div><div class="puzzle-stage"><div id="puzzle" class="fto-net" aria-live="polite"></div><div id="loadingCube" class="cube-loading">טוען פריסת FTO…</div></div><div id="moveControls" class="move-controls"><div class="control-heading"><span>בצע תנועה</span><small>לחיצה על פאה או על התנועה ההפוכה</small></div><div id="moveGrid" class="move-grid" dir="ltr"></div><div class="move-utilities"><button id="undoBtn" type="button">↶ ביטול</button><button id="resetBtn" type="button">↻ התחלה מחדש</button><span id="moveCounter">0 תנועות</span></div></div><div id="puzzleNote" class="puzzle-note">פריסת ה־FTO מתעדכנת לאחר כל תנועה. אפשר לעקוב אחרי החלקים בלי תלות ב־3D.</div></section>
+      <section class="puzzle-panel"><div class="puzzle-top"><span class="live-indicator"><i></i> FTO LIVE</span><span class="view-actions"><button class="view-toggle active" type="button" data-view="3d" aria-pressed="true">3D מונפש</button><button class="view-toggle" type="button" data-view="2d" aria-pressed="false">פריסה 2D</button><button id="resetViewBtn" class="text-btn" type="button">איפוס ↺</button></span></div><div class="puzzle-stage"><div id="puzzle3d" class="fto-player-host" aria-live="polite"></div><div id="puzzle2d" class="fto-net hidden" aria-live="polite"></div><div id="loadingCube" class="cube-loading">טוען FTO מונפש…</div></div><div id="moveControls" class="move-controls"><div class="control-heading"><span>בצע תנועה</span><small>לחיצה על פאה או על התנועה ההפוכה</small></div><div id="moveGrid" class="move-grid" dir="ltr"></div><div class="move-utilities"><button id="undoBtn" type="button">↶ ביטול</button><button id="resetBtn" type="button">↻ התחלה מחדש</button><span id="moveCounter">0 תנועות</span></div></div><div id="puzzleNote" class="puzzle-note">כל לחיצה מפעילה סיבוב מונפש. אפשר לעבור לפריסה דו־ממדית בכל רגע.</div></section>
     </main>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="installModal" class="modal-wrap hidden"><div class="modal"><button id="closeModal" class="modal-close" aria-label="סגירה">×</button><img src="./icon.svg" alt="" width="66" height="66"><h2>FTO Quest בכיס שלך</h2><p id="installInstructions"></p><button id="modalOk" class="primary-btn">הבנתי</button></div></div>
   </div>
-  <script type="module" src="./app.js?v=6"></script>
+  <script type="module" src="./app.js?v=7"></script>
 </body>
 </html>
