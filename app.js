@@ -41,8 +41,84 @@ function animatePlayerMove(move){if(!state.player)return;const before=state.move
 function applyTheme(theme){document.documentElement.dataset.theme=theme;const dark=theme==='dark';$('themeBtn').textContent=dark?'☀':'☾';$('themeBtn').setAttribute('aria-label',dark?'הפעלת מצב בהיר':'הפעלת מצב כהה');$('themeBtn').title=dark?'מצב בהיר':'מצב כהה';document.querySelector('meta[name="theme-color"]').content=dark?'#0b1220':'#111a2d'}
 function initTheme(){const saved=localStorage.getItem(THEME_KEY);applyTheme(saved||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'))}
 function toggleTheme(){const next=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem(THEME_KEY,next);applyTheme(next)}
-function renderLesson(){const l=lessons[state.active];$('chapterTag').textContent=state.mode==='lab'?'מעבדת אימון':l.tag;$('lessonCount').textContent=state.mode==='lab'?'תרגול חופשי':`${state.active+1} / ${lessons.length}`;$('lessonTitle').textContent=state.mode==='lab'?'מעבדת הקובייה':l.title;$('lessonIntro').textContent=state.mode==='lab'?'התנסה בתנועות, צור ערבוב מלא לאימון, או מדוד פתרון על הקובייה שבידך.':l.intro;renderTask();renderFooter();renderControls()}
-function renderTask(){const box=$('lessonTask');const l=lessons[state.active];if(state.mode==='lab'){box.innerHTML=`<div class="task-kicker">FREE PLAY</div><h3>ניסוי, ערבוב וזמן</h3><p>הקובייה הווירטואלית מגיבה לתנועות בכפתורים. את הערבוב אפשר להחיל גם על קובייה פיזית.</p><div class="move-goal"><small>ערבוב</small><code id="scrambleText" style="font-size:13px;max-width:75%;overflow:auto">${state.randomScramble||'הקובייה פתורה'}</code></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:17px"><button class="next-btn" data-action="scramble">צור ערבוב FTO</button><button class="answer" data-action="timer" style="width:auto">${state.timerStart?'עצור טיימר':'התחל טיימר'}</button></div><div id="timerReadout" class="alg-display" style="margin-top:17px">00:00.0</div><div class="pill-note">הערבובים מיועדים לאימון אישי, לא לשימוש כערבוב רשמי בתחרות WCA.</div>`;return}
+function renderLesson(){const l=lessons[state.active];$('chapterTag').textContent=state.mode==='lab'?'מעבדת אימון':l.tag;$('lessonCount').textContent=state.mode==='lab'?'תרגול חופשי':`${state.active+1} / ${lessons.length}`;$('lessonTitle').textContent=state.mode==='lab'?'מעבדת הקובייה':l.title;$('lessonIntro').textContent=state.mode==='lab'?'התנסה בתנועות, צור ערבוב מלא לאימון, או מדוד פתרון על הקובייה שבידך.':l.intro;renderTask();renderFooter();renderControls();renderLessonVisual()}
+
+const faceExamples = [
+  [
+    {label:'שלוש צלעות לבנות', faces:[{edges:'#fff8eb'}]},
+    {label:'משושה לבן שלם', faces:[{edges:'#fff8eb', centers:'#fff8eb'}]}
+  ],
+  [
+    {label:'אותה פינה בשתי פאות צד', faces:[{corner:'#f56a5b'}, {corner:'#53a6fc'}]},
+    {label:'מוסיפים משולש מרכז בצבע תואם בכל צד', faces:[{corner:'#f56a5b', nearCenter:'#f56a5b'}, {corner:'#53a6fc', nearCenter:'#53a6fc'}]}
+  ],
+  [
+    {label:'שומרים על המרכז שכבר בנינו', faces:[{edges:'#fff8eb', centers:'#fff8eb'}]},
+    {label:'בונים משושה נוסף בצבע של הפאה', faces:[{edges:'#53a6fc', centers:'#53a6fc'}]}
+  ]
+];
+
+function faceDiagram({edges, centers, corner, nearCenter}) {
+  const colors = [corner, edges, nearCenter || centers, edges, null, centers, edges, centers, null];
+  const triangles = [];
+  for (let row = 0; row < 3; row++) {
+    for (let column = 0; column < row * 2 + 1; column++) {
+      const x = 60 - row * 18 + column * 18;
+      const y = 8 + row * 31;
+      const points = column % 2 === 0
+        ? `${x},${y} ${x - 18},${y + 31} ${x + 18},${y + 31}`
+        : `${x - 18},${y} ${x + 18},${y} ${x},${y + 31}`;
+      const fill = colors[triangles.length] || '#536177';
+      triangles.push(`<polygon points="${points}" fill="${fill}"/>`);
+    }
+  }
+  return `<svg aria-hidden="true" viewBox="0 0 120 108" stroke="#172338" stroke-width="2">${triangles.join('')}</svg>`;
+}
+
+function patternPreview(alg) {
+  const template = document.createElement('template');
+  template.innerHTML = state.svg;
+  const svg = template.content.querySelector('svg');
+  const pattern = state.model.defaultPattern().applyAlg(alg);
+  for (const orbit of pattern.kpuzzle.definition.orbits) {
+    const data = pattern.patternData[orbit.orbitName];
+    for (let index = 0; index < orbit.numPieces; index++) {
+      for (let orientation = 0; orientation < orbit.numOrientations; orientation++) {
+        const target = svg.querySelector(`#${pieceID(orbit.orbitName, index, orientation)}`);
+        const originalOrientation = (orbit.numOrientations - data.orientation[index] + orientation) % orbit.numOrientations;
+        const color = state.svgColors.get(pieceID(orbit.orbitName, data.pieces[index], originalOrientation));
+        if (target && color) target.style.fill = color;
+      }
+    }
+  }
+  svg.querySelectorAll('[id]').forEach(element => element.removeAttribute('id'));
+  svg.setAttribute('aria-hidden', 'true');
+  return svg.outerHTML;
+}
+
+function renderLessonVisual() {
+  $('lessonVisual')?.remove();
+  if (state.mode !== 'lesson') return;
+  const lesson = lessons[state.active];
+  const examples = lesson.kind === 'guide' ? faceExamples[state.active - 1] : null;
+  if (!examples && !state.svgColors.size) return;
+  const previews = examples
+    ? examples.map(({label, faces}) => [label, faces.map(faceDiagram).join('')])
+    : lesson.kind === 'solve'
+      ? [['מצב הפתיחה', patternPreview(lesson.setup)], ['יעד: כל פאה בצבע אחד', patternPreview('')]]
+      : state.active === 0
+        ? [['אחרי U', patternPreview('U')], ['אחרי U ואז U′', patternPreview("U U'")]]
+        : [['לפני הטריגר', patternPreview('')], ['אחרי הטריגר', patternPreview(lesson.sequence.join(' '))]];
+  $('lessonTask').insertAdjacentHTML('afterend', `
+    <section id="lessonVisual" class="lesson-visual" aria-label="המחשה למשימה">
+      <h3>${examples ? 'מה לחפש על הקובייה' : 'איך זה נראה על הקובייה'}</h3>
+      <div class="visual-cards">${previews.map(([label, drawing]) => `
+        <figure><div class="visual-drawing">${drawing}</div><figcaption>${label}</figcaption></figure>
+      `).join('')}</div>
+      ${examples ? '<p>התרשים מדגיש את החלקים הרלוונטיים. הצבעים להמחשה.</p>' : ''}
+    </section>`);
+}
+function renderTask(){const box=$('lessonTask');const l=lessons[state.active];if(state.mode==='lab'){box.innerHTML=`<div class="task-kicker">FREE PLAY</div><h3>ניסוי, ערבוב וזמן</h3><p>הקובייה הווירטואלית מגיבה לתנועות בכפתורים. את הערבוב אפשר להחיל גם על קובייה פיזית.</p><div class="move-goal"><small>ערבוב</small><code id="scrambleText" style="font-size:13px;max-width:75%;overflow:auto">${state.randomScramble||'הקובייה פתורה'}</code></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:17px"><button class="next-btn" data-action="scramble">צור ערבוב FTO</button><button class="answer" data-action="timer" style="width:auto">${state.timerStart?'עצור טיימר':'התחל טיימר'}</button></div><div id="timerReadout" class="alg-display" style="margin-top:17px">00:00.0</div>`;return}
   const done=state.completed.has(state.active);let html=`<div class="task-kicker">${done?'✓ הושלם · אפשר לתרגל שוב':'המשימה שלך'}</div>`;
   if(l.kind==='quiz'){const q=l.questions[state.quiz];if(q){html+=`<h3>${q.q}</h3><p>בחר תשובה כדי להתקדם.</p><div class="answer-list">${q.options.map((o,i)=>`<button class="answer" data-answer="${i}">${o}</button>`).join('')}</div>`}else{html+=`<h3>אתה רואה את המבנה!</h3><p>עכשיו אפשר להתחיל להזיז את הקובייה ולקרוא את הסימון שלה.</p>`}}
   if(l.kind==='sequence'){html+=`<h3>${l.instruction}</h3><div class="sequence">${l.sequence.map((m,i)=>`<span class="${i<state.sequence?'passed':i===state.sequence?'current':''}">${m}</span>`).join('')}</div><div class="move-goal"><small>התנועה הבאה</small><code>${l.sequence[state.sequence]||'✓ הושלם'}</code></div>`}
@@ -64,5 +140,5 @@ function installHelp(){const ios=/iPad|iPhone|iPod/.test(navigator.userAgent);$(
 document.addEventListener('click',async e=>{const lesson=e.target.closest('[data-lesson]');if(lesson){openLesson(Number(lesson.dataset.lesson));return}const view=e.target.closest('[data-view]');if(view){setPuzzleView(view.dataset.view);return}const move=e.target.closest('[data-move]');if(move){applyMove(move.dataset.move);return}const ans=e.target.closest('[data-answer]');if(ans){const l=lessons[state.active],q=l.questions[state.quiz],correct=Number(ans.dataset.answer)===q.answer;ans.classList.add(correct?'correct':'wrong');say(correct?q.why:'נסה שוב — הסתכל על המבנה של הקובייה.',!correct);if(correct){document.querySelectorAll('[data-answer]').forEach(b=>b.disabled=true);setTimeout(()=>{state.quiz++;state.feedback='';if(state.quiz>=l.questions.length)complete();else renderTask()},850)}return}const action=e.target.closest('[data-action]')?.dataset.action;if(!action)return;if(action==='guide-done')complete();if(action==='next')state.active<lessons.length-1?openLesson(state.active+1):openLab();if(action==='home')showHome();if(action==='scramble')await scramble();if(action==='timer')toggleTimer()});
 $('startBtn').addEventListener('click',()=>openLesson(lessons.findIndex((_,i)=>!state.completed.has(i))<0?0:lessons.findIndex((_,i)=>!state.completed.has(i))));$('labBtn').addEventListener('click',openLab);$('backBtn').addEventListener('click',showHome);$('undoBtn').addEventListener('click',undo);$('resetBtn').addEventListener('click',resetPractice);$('resetViewBtn').addEventListener('click',resetPractice);$('themeBtn').addEventListener('click',toggleTheme);$('installBtn').addEventListener('click',async()=>{if(state.installPrompt){state.installPrompt.prompt();await state.installPrompt.userChoice;state.installPrompt=null}else installHelp()});$('closeModal').addEventListener('click',()=>$('installModal').classList.add('hidden'));$('modalOk').addEventListener('click',()=>$('installModal').classList.add('hidden'));$('installModal').addEventListener('click',e=>{if(e.target===$('installModal'))$('installModal').classList.add('hidden')});window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();state.installPrompt=e});window.addEventListener('appinstalled',()=>toast('FTO Quest הותקנה במסך הבית!'));
 initTheme();renderProgress();renderNav();if(location.hash==='#lab')openLab();else if(/^#lesson-(\d+)$/.test(location.hash)){const i=Number(location.hash.match(/\d+/)[0])-1;if(i>=0&&i<lessons.length)openLesson(i)}
-try{const {puzzles}=await import('https://cdn.cubing.net/v0/js/cubing/puzzles');state.model=await puzzles.fto.kpuzzle();state.svg=await puzzles.fto.svg();try{await import('https://cdn.cubing.net/v0/js/cubing/twisty');state.player=$('ftoPlayer');state.player.tempoScale=1.45;renderPlayer()}catch(playerError){console.error('Animated FTO player unavailable',playerError);state.view='2d';toast('הנגן המונפש לא נטען; מוצגת פריסת 2D.')}state.ready=true;if(state.mode!=='home'){renderPuzzleViews();syncPuzzle()}$('loadingCube').classList.add('hidden')}catch(e){console.error('FTO engine unavailable',e);$('loadingCube').textContent='לא ניתן לטעון את הקובייה. בדוק חיבור לאינטרנט ורענן את הדף.'}
+try{const {puzzles}=await import('https://cdn.cubing.net/v0/js/cubing/puzzles');state.model=await puzzles.fto.kpuzzle();state.svg=await puzzles.fto.svg();try{await import('https://cdn.cubing.net/v0/js/cubing/twisty');state.player=$('ftoPlayer');state.player.tempoScale=1.45;renderPlayer()}catch(playerError){console.error('Animated FTO player unavailable',playerError);state.view='2d';toast('הנגן המונפש לא נטען; מוצגת פריסת 2D.')}state.ready=true;if(state.mode!=='home'){renderPuzzleViews();syncPuzzle();renderLessonVisual()}$('loadingCube').classList.add('hidden')}catch(e){console.error('FTO engine unavailable',e);$('loadingCube').textContent='לא ניתן לטעון את הקובייה. בדוק חיבור לאינטרנט ורענן את הדף.'}
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
