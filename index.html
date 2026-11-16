@@ -11,7 +11,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="icon" type="image/svg+xml" href="./icon.svg">
   <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <link rel="stylesheet" href="./style.css?v=9">
+  <link rel="stylesheet" href="./style.css?v=10">
   <title>FTO Quest — לומדים לפתור</title>
 </head>
 <body>
@@ -39,11 +39,11 @@
     <main id="lessonView" class="lesson-view hidden">
       <aside class="lesson-sidebar"><button id="backBtn" class="back-btn" type="button">→ חזרה למסלול</button><div class="sidebar-heading">המסלול שלי</div><nav id="lessonNav" aria-label="משימות לימוד"></nav><div class="sidebar-tip"><span>💡</span><p>אפשר לחזור לכל משימה בכל רגע. טעויות הן חלק מהאימון.</p></div></aside>
       <section class="lesson-content"><div class="lesson-meta"><span id="chapterTag"></span><span id="lessonCount"></span></div><h2 id="lessonTitle"></h2><p id="lessonIntro" class="lesson-intro"></p><div id="lessonTask" class="lesson-task"></div><div id="lessonFooter" class="lesson-footer"></div></section>
-      <section class="puzzle-panel"><div class="puzzle-top"><span class="live-indicator"><i></i> FTO LIVE</span><span class="view-actions"><button class="view-toggle active" type="button" data-view="3d" aria-pressed="true">3D מונפש</button><button class="view-toggle" type="button" data-view="2d" aria-pressed="false">פריסה 2D</button><button id="resetViewBtn" class="text-btn" type="button">איפוס ↺</button></span></div><div class="puzzle-stage"><div id="puzzle3d" class="fto-player-host" aria-live="polite"><twisty-player id="ftoPlayer" class="fto-player" puzzle="fto" alg="U U'" experimental-setup-alg="" hint-facelets="none" back-view="side-by-side" background="none" control-panel="none" aria-label="קוביית FTO תלת־ממדית מונפשת"></twisty-player></div><div id="puzzle2d" class="fto-net hidden" aria-live="polite"></div><div id="loadingCube" class="cube-loading">טוען FTO מונפש…</div></div><div id="moveControls" class="move-controls"><div class="control-heading"><span>בצע תנועה</span><small>לחיצה על פאה או על התנועה ההפוכה</small></div><div id="moveGrid" class="move-grid" dir="ltr"></div><div class="move-utilities"><button id="undoBtn" type="button">↶ ביטול</button><button id="resetBtn" type="button">↻ התחלה מחדש</button><span id="moveCounter">0 תנועות</span></div></div><div id="puzzleNote" class="puzzle-note">כל לחיצה מפעילה סיבוב מונפש. אפשר לעבור לפריסה דו־ממדית בכל רגע.</div></section>
+      <section class="puzzle-panel"><div class="puzzle-top"><span class="live-indicator"><i></i> FTO LIVE</span><span class="view-actions"><button class="view-toggle active" type="button" data-view="3d" aria-pressed="true">3D מונפש</button><button class="view-toggle" type="button" data-view="2d" aria-pressed="false">פריסה 2D</button><button id="resetViewBtn" class="text-btn" type="button">איפוס ↺</button></span></div><div class="puzzle-stage"><div id="puzzle3d" class="fto-player-host" aria-live="polite"><twisty-player id="ftoPlayer" class="fto-player" puzzle="fto" alg="U U'" aria-label="קוביית FTO תלת־ממדית מונפשת"></twisty-player></div><div id="puzzle2d" class="fto-net hidden" aria-live="polite"></div><div id="loadingCube" class="cube-loading">טוען FTO מונפש…</div></div><div id="moveControls" class="move-controls"><div class="control-heading"><span>בצע תנועה</span><small>לחיצה על פאה או על התנועה ההפוכה</small></div><div id="moveGrid" class="move-grid" dir="ltr"></div><div class="move-utilities"><button id="undoBtn" type="button">↶ ביטול</button><button id="resetBtn" type="button">↻ התחלה מחדש</button><span id="moveCounter">0 תנועות</span></div></div><div id="puzzleNote" class="puzzle-note">כל לחיצה מפעילה סיבוב מונפש. אפשר לעבור לפריסה דו־ממדית בכל רגע.</div></section>
     </main>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <div id="installModal" class="modal-wrap hidden"><div class="modal"><button id="closeModal" class="modal-close" aria-label="סגירה">×</button><img src="./icon.svg" alt="" width="66" height="66"><h2>FTO Quest בכיס שלך</h2><p id="installInstructions"></p><button id="modalOk" class="primary-btn">הבנתי</button></div></div>
   </div>
-  <script type="module" src="./app.js?v=9"></script>
+  <script type="module" src="./app.js?v=10"></script>
 </body>
 </html>
