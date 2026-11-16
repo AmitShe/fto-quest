@@ -16,3 +16,5 @@ html[data-theme="dark"]{color-scheme:dark;--ink:#e7edf7;--muted:#a4b0c2;--paper:
 .visual-cards figcaption{margin-top:6px;line-height:1.25}
 #ftoPlayer{display:grid;height:clamp(280px,42vw,420px)}
 @media(max-width:520px){#ftoPlayer{height:280px}}
+.scramble-code{font-size:13px!important;line-height:1.5;white-space:normal;overflow-wrap:anywhere;text-align:left}
+.physical-done{margin-top:12px}
